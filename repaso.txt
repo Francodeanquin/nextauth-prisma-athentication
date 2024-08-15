@@ -1,0 +1,60 @@
+$ npx create-next-app <app-name>
+
+npm i prisma -D
+
+npx prisma init =>configura por defecto con postgreSQL(USAMOS ESTE)
+
+(npx prisma --datasource-provider <nombre de otra base de datos>)
+
+
+crear carpeta "lib" y archivo "db.ts" dentro de src, esto sera para la configuracion de prisma
+
+al hacer un cambio en los schemas de prisma hacemos este codigo
+
+ npx prisma migrate dev --name init =>
+ cambio en entorno DEV, en este caso le agrego un nombre a este cambio, esto tambien me conecta a mi base de datos y me instala PRISMA client
+
+ en db vamos a agregar una porcion de codigo (busca como best practices prisma en google) :
+
+ import { PrismaClient } from '@prisma/client'
+
+const prismaClientSingleton = () => {
+  return new PrismaClient()
+}
+
+declare const globalThis: {
+  prismaGlobal: ReturnType<typeof prismaClientSingleton>;
+} & typeof global;
+
+const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
+
+export default prisma
+
+if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = prisma
+
+en caso de ser solo javascript, chatgpt lo convierte asi:
+
+const { PrismaClient } = require("@prisma/client");
+
+const prismaClientSingleton = () => {
+  return new PrismaClient();
+};
+
+const globalThis = typeof global !== "undefined" ? global : window;
+
+const prisma = globalThis.prismaGlobal || prismaClientSingleton();
+
+module.exports = prisma;
+
+if (process.env.NODE_ENV !== "production") {
+  globalThis.prismaGlobal = prisma;
+}
+
+
+npm i bcrypt para el back (auth route.js)
+
+npm i next-auth para el login
+
+creamos la carpeta "[...nextauth] y dentro el archivo route.js en nuestra carpeta "auth" de api
+esa sintaxis entre corchetes significa que todas las peticiones van a pasar
+por esta carpeta 
